@@ -1,0 +1,3 @@
+rootProject.name = 'mine-k-web'
+
+include('minek-spring-boot-auth', 'minek-spring-boot-retrofit')
