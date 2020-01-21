@@ -1,14 +1,14 @@
 package minek.excel
 
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.apache.poi.ss.usermodel.*
-import org.apache.poi.xssf.streaming.SXSSFWorkbook
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.File
 import java.io.OutputStream
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.ss.usermodel.*
+import org.apache.poi.xssf.streaming.SXSSFWorkbook
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
 
 @Suppress("SpellCheckingInspection")
 enum class WorkbookType(val extension: String) {
@@ -218,6 +218,7 @@ class Row(
 }
 
 class Cell(private val cell: org.apache.poi.ss.usermodel.Cell) {
+    @Suppress("DEPRECATION")
     var cellType: CellType
         set(value) {
             cell.cellType = value

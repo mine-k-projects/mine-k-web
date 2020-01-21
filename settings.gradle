@@ -4,9 +4,9 @@ include(
         'minek-core',
         'minek-excel',
         'minek-jooq',
-        'minek-spring-boot-auth',
-        'minek-spring-boot-form',
-        'minek-spring-boot-retrofit',
-        'minek-spring-boot-storage',
-        'minek-spring-boot-router'
+        'minek-spring-auth',
+        'minek-spring-storage',
+        'minek-spring-form',
+        'minek-spring-router',
+        'minek-spring-boot-retrofit'
 )
