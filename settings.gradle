@@ -1,3 +1,12 @@
 rootProject.name = 'mine-k-web'
 
-include('minek-spring-boot-auth', 'minek-spring-boot-retrofit')
+include(
+        'minek-core',
+        'minek-excel',
+        'minek-jooq',
+        'minek-spring-boot-auth',
+        'minek-spring-boot-form',
+        'minek-spring-boot-retrofit',
+        'minek-spring-boot-storage',
+        'minek-spring-boot-router'
+)

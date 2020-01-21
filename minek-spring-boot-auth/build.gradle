@@ -1,0 +1,9 @@
+apply plugin: "org.springframework.boot"
+apply plugin: "io.spring.dependency-management"
+apply plugin: "org.jetbrains.kotlin.plugin.spring"
+
+dependencies {
+    compile(project(":minek-spring-boot-storage"))
+    implementation "org.springframework.boot:spring-boot-autoconfigure:${versions.spring_boot}"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+}

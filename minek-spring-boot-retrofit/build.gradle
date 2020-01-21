@@ -1,0 +1,6 @@
+apply plugin: "org.jetbrains.kotlin.plugin.spring"
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-autoconfigure:${versions.spring_boot}"
+    compile "com.squareup.retrofit2:retrofit:${versions.retrofit}"
+}
