@@ -8,5 +8,6 @@ include(
         'minek-spring-storage',
         'minek-spring-form',
         'minek-spring-router',
-        'minek-spring-retrofit'
+        'minek-spring-retrofit',
+        'minek-spring-devtools',
 )
