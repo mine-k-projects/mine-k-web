@@ -1,0 +1,57 @@
+buildscript {
+    def env = { String name -> System.getProperty(name, System.getenv(name)) }
+
+    ext.database = [
+            'library' : 'org.postgresql:postgresql:42.2.9',
+            'driver'  : 'org.postgresql.Driver',
+            'url'     : env("JDBC_URL") ?: 'jdbc:postgresql://localhost:5432/kotlin-setting',
+            'username': env("JDBC_USERNAME") ?: 'postgres',
+            'password': env("JDBC_PASSWORD") ?: '1234'
+    ]
+}
+
+apply plugin: 'application'
+mainClassName = 'minek.sample.app.AppKt'
+
+apply plugin: "org.springframework.boot"
+apply plugin: "io.spring.dependency-management"
+apply plugin: "org.jetbrains.kotlin.plugin.spring"
+
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+dependencies {
+    compile(project(":minek-core"))
+    compile(project(":minek-spring-retrofit"))
+    compile(project(":minek-spring-devtools"))
+    compile(project(":minek-spring-web"))
+
+    implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-jooq'
+    implementation('org.springframework.boot:spring-boot-starter-web') {
+        exclude group: "org.springframework.boot", module: "spring-boot-starter-tomcat"
+    }
+    implementation("org.springframework.boot:spring-boot-starter-undertow")
+    implementation 'org.codehaus.groovy:groovy'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+
+    implementation database.library
+
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.10.1"
+
+    implementation "com.squareup.retrofit2:converter-jackson:$versions.retrofit"
+    implementation "com.squareup.retrofit2:converter-scalars:$versions.retrofit"
+}

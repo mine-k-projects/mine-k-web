@@ -10,5 +10,6 @@ include(
         'minek-spring-router',
         'minek-spring-retrofit',
         'minek-spring-devtools',
-        'minek-spring-web'
+        'minek-spring-web',
+        'sample-web-app'
 )

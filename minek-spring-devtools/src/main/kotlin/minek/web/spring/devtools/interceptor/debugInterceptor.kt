@@ -5,9 +5,11 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import mu.toKLogger
 import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Component
 import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter
 
+@Component
 class DebugInterceptor : HandlerInterceptorAdapter() {
 
     private val logger = LoggerFactory.getLogger(DebugInterceptor::class.java).toKLogger()

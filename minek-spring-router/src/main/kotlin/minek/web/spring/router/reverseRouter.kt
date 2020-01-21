@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest
 import kotlin.reflect.KFunction
 import kotlin.reflect.jvm.javaMethod
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
 import org.springframework.web.util.UriComponentsBuilder
 
@@ -104,6 +105,7 @@ class CurrentUriBuilder(private val request: HttpServletRequest) : AbstractUriBu
     }
 }
 
+@Component
 class ReverseRouter {
 
     @Autowired

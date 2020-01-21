@@ -8,6 +8,7 @@ import minek.web.spring.storage.SessionStorageService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 import org.springframework.core.annotation.AnnotatedElementUtils
+import org.springframework.stereotype.Component
 import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter
 
@@ -16,6 +17,7 @@ interface Principal {
     val role: String
 }
 
+@Component
 class AuthService {
 
     companion object {
@@ -70,6 +72,7 @@ interface PolicyAuthentication {
     fun handle(principal: Principal): Boolean
 }
 
+@Component
 class AuthorizationHandlerInterceptorAdapter : HandlerInterceptorAdapter() {
 
     private val annotationTypes =

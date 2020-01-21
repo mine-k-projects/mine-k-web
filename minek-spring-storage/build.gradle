@@ -1,6 +1,7 @@
 apply plugin: "org.jetbrains.kotlin.plugin.spring"
 
 dependencies {
+    compile "org.springframework:spring-context:${versions.spring}"
     compile "org.springframework:spring-web:${versions.spring}"
     compileOnly "javax.servlet:javax.servlet-api:3.1.0"
 }

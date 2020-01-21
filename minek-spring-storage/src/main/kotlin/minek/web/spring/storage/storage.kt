@@ -16,6 +16,7 @@ import minek.web.spring.storage.exception.StorageException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.core.io.UrlResource
+import org.springframework.stereotype.Component
 import org.springframework.util.FileSystemUtils
 import org.springframework.util.StringUtils
 import org.springframework.web.multipart.MultipartFile
@@ -39,6 +40,7 @@ interface KeyAndValueStorageService : StorageService {
     fun remove(name: String)
 }
 
+@Component
 class SessionStorageService : KeyAndValueStorageService {
 
     @Autowired
