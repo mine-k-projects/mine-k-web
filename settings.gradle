@@ -8,5 +8,5 @@ include(
         'minek-spring-storage',
         'minek-spring-form',
         'minek-spring-router',
-        'minek-spring-boot-retrofit'
+        'minek-spring-retrofit'
 )

@@ -1,4 +1,4 @@
-package minek.web.spring.boot.retrofit.annotation
+package minek.web.spring.retrofit.annotation
 
 import org.springframework.stereotype.Component
 

@@ -1,6 +1,6 @@
-package minek.web.spring.boot.retrofit.autoconfigure
+package minek.web.spring.retrofit.autoconfigure
 
-import minek.web.spring.boot.retrofit.config.RetrofitServiceRegistrar
+import minek.web.spring.retrofit.config.RetrofitServiceRegistrar
 import org.springframework.context.annotation.Import
 
 @Target(AnnotationTarget.ANNOTATION_CLASS, AnnotationTarget.CLASS)
