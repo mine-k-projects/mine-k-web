@@ -1,9 +1,9 @@
 package minek.sample.app.controller
 
-import minek.web.spring.auth.Authorize
 import minek.web.spring.auth.PolicyAuthentication
-import minek.web.spring.auth.PolicyAuthorize
 import minek.web.spring.auth.Principal
+import minek.web.spring.auth.annotation.Authorize
+import minek.web.spring.auth.annotation.PolicyAuthorize
 import minek.web.spring.retrofit.annotation.RetrofitService
 import minek.web.spring.router.ReverseRouter
 import minek.web.spring.web.controller.BaseController

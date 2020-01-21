@@ -1,9 +1,10 @@
 package minek.web.spring.auth
 
-import java.lang.annotation.Inherited
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-import kotlin.reflect.KClass
+import minek.web.spring.auth.annotation.AllowAnonymous
+import minek.web.spring.auth.annotation.Authorize
+import minek.web.spring.auth.annotation.PolicyAuthorize
 import minek.web.spring.storage.SessionStorageService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
@@ -15,6 +16,10 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter
 interface Principal {
     val username: String
     val role: String
+}
+
+interface PolicyAuthentication {
+    fun handle(principal: Principal): Boolean
 }
 
 @Component
@@ -37,39 +42,6 @@ class AuthService {
         sessionStorageService.remove(PRINCIPAL_SESSION_KEY)
         sessionStorageService.expire()
     }
-}
-
-/**
- * or condition
- */
-@Target(AnnotationTarget.ANNOTATION_CLASS, AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.RUNTIME)
-@MustBeDocumented
-@Inherited
-@Repeatable
-annotation class Authorize(val roles: Array<String> = [])
-
-/**
- * and condition
- */
-@Target(AnnotationTarget.ANNOTATION_CLASS, AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.RUNTIME)
-@MustBeDocumented
-@Inherited
-@Repeatable
-annotation class PolicyAuthorize(val policy: KClass<out PolicyAuthentication>)
-
-/**
- * top level
- */
-@Target(AnnotationTarget.ANNOTATION_CLASS, AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.RUNTIME)
-@MustBeDocumented
-@Inherited
-annotation class AllowAnonymous
-
-interface PolicyAuthentication {
-    fun handle(principal: Principal): Boolean
 }
 
 @Component
