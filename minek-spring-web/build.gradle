@@ -1,7 +1,9 @@
 apply plugin: "org.jetbrains.kotlin.plugin.spring"
 
 dependencies {
-    compile project(path: ":minek-spring-storage")
+    compile project(path: ":minek-core")
+    compile project(path: ":minek-spring-form")
+    compile project(path: ":minek-spring-auth")
     compile project(path: ":minek-spring-router")
 
     compile "org.springframework:spring-web:${versions.spring}"

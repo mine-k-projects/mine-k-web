@@ -1,5 +1,7 @@
 package minek.web.spring.web.controller
 
+import minek.web.spring.auth.AuthService
+import minek.web.spring.auth.Principal
 import minek.web.spring.storage.SessionStorageService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -13,6 +15,13 @@ class RequestGlobal {
 
     @Autowired
     lateinit var sessionStorageService: SessionStorageService
+
+    @Autowired
+    lateinit var authService: AuthService
+
+    fun loginUser(): Principal? = authService.principal()
+
+    fun isLogin(): Boolean = loginUser() != null
 
     fun alerts(): List<String> {
         return sessionStorageService.get(REQUEST_GLOBAL_ALERTS) { listOf() }

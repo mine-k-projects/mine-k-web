@@ -25,11 +25,7 @@ class AuthService {
     @Autowired
     lateinit var sessionStorageService: SessionStorageService
 
-    fun principal(): Principal? = sessionStorageService.get<Principal>(
-        PRINCIPAL_SESSION_KEY
-    )
-
-    fun isLogin(): Boolean = principal() != null
+    fun principal(): Principal? = sessionStorageService.get<Principal>(PRINCIPAL_SESSION_KEY)
 
     fun set(principal: Principal) {
         sessionStorageService.set(PRINCIPAL_SESSION_KEY, principal)
