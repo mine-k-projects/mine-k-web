@@ -14,3 +14,10 @@ fun String.truncate(length: Int, truncateString: String = Typography.ellipsis.to
     } else {
         this.substring(0, length) + truncateString
     }
+
+fun String.base64Encoded(): String = Base64.getEncoder().encodeToString(toByteArray())
+fun String.base64Decoded(): String? = try {
+    String(Base64.getDecoder().decode(toByteArray()))
+} catch (e: IllegalArgumentException) {
+    null
+}
