@@ -1,0 +1,9 @@
+apply plugin: "org.jetbrains.kotlin.plugin.spring"
+
+dependencies {
+    compile project(path: ":minek-spring-storage")
+    compile project(path: ":minek-spring-router")
+
+    compile "org.springframework:spring-web:${versions.spring}"
+    compileOnly "javax.servlet:javax.servlet-api:3.1.0"
+}
