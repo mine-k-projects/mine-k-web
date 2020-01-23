@@ -21,3 +21,6 @@ fun String.base64Decoded(): String? = try {
 } catch (e: IllegalArgumentException) {
     null
 }
+
+fun String.isNumeric(): Boolean = this.matches("-?\\d+(\\.\\d+)?".toRegex())
+fun String.isDigit(): Boolean = this.matches("^[0-9]*\$".toRegex())

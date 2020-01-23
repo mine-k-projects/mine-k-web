@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 
 class ReduxTest {
 
-    val PojoStateReducer: Reducer<PojoState> = { previousState, action ->
+    private val pojoStateReducer: Reducer<PojoState> = { previousState, action ->
         when (action) {
             is PojoActions.Init -> PojoState("", "")
             is PojoActions.SetFoo -> previousState.copy(foo = action.foo)
@@ -23,7 +23,7 @@ class ReduxTest {
 
     @Test
     fun test() {
-        val store = DefaultStore(initialState = PojoState("", ""), reducer = PojoStateReducer)
+        val store = DefaultStore(initialState = PojoState("", ""), reducer = pojoStateReducer)
         store.subscribe {
             println(it)
         }
