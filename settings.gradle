@@ -4,6 +4,7 @@ include(
         'minek-core',
         'minek-excel',
         'minek-jooq',
+        'minek-redux',
         'minek-spring-auth',
         'minek-spring-storage',
         'minek-spring-form',
