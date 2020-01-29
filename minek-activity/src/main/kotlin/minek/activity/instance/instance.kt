@@ -1,11 +1,17 @@
 package minek.activity.instance
 
+import com.fasterxml.jackson.databind.JsonNode
 import minek.activity.ProcessManager
 import minek.activity.behavior.BehaviorFactory
 import minek.activity.extension.initialFlowElement
 import org.camunda.bpm.model.bpmn.BpmnModelInstance
 import org.camunda.bpm.model.bpmn.instance.FlowNode
 import org.camunda.bpm.model.bpmn.instance.Process
+import java.io.Serializable
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.util.*
 
 enum class ActivityStatus {
     READY, RUNNING, COMPLETED, SUSPENDED, STOPPED
@@ -37,7 +43,22 @@ abstract class Instance(val bpmnModelInstance: BpmnModelInstance, val processMan
     abstract fun setActivityStatus(id: String, status: ActivityStatus)
     abstract fun getActivityStatus(id: String): ActivityStatus
 
-    abstract fun addVariable(name: String, value: Any)
+    fun addVariable(name: String, value: Boolean) = this.addVariableStore(name, value)
+    fun addVariable(name: String, value: ByteArray) = this.addVariableStore(name, value)
+    fun addVariable(name: String, value: Double) = this.addVariableStore(name, value)
+    fun addVariable(name: String, value: Float) = this.addVariableStore(name, value)
+    fun addVariable(name: String, value: Int) = this.addVariableStore(name, value)
+    fun addVariable(name: String, value: JsonNode) = this.addVariableStore(name, value)
+    fun addVariable(name: String, value: Long) = this.addVariableStore(name, value)
+    fun addVariable(name: String, value: Serializable) = this.addVariableStore(name, value)
+    fun addVariable(name: String, value: Short) = this.addVariableStore(name, value)
+    fun addVariable(name: String, value: String) = this.addVariableStore(name, value)
+    fun addVariable(name: String, value: UUID) = this.addVariableStore(name, value)
+    fun addVariable(name: String, value: Date) = this.addVariableStore(name, value)
+    fun addVariable(name: String, value: LocalDate) = this.addVariableStore(name, value)
+    fun addVariable(name: String, value: LocalDateTime) = this.addVariableStore(name, value)
+    fun addVariable(name: String, value: LocalTime) = this.addVariableStore(name, value)
+    abstract fun addVariableStore(name: String, value: Any)
     abstract fun setVariables(variables: Map<String, Any>)
     abstract fun getVariables(): Map<String, Any>
 }
@@ -63,8 +84,8 @@ class StatefulInstance(
         TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun addVariable(name: String, value: Any) {
-        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
+    override fun addVariableStore(name: String, value: Any) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun setVariables(variables: Map<String, Any>) {
@@ -80,12 +101,9 @@ class StatelessInstance(
     bpmnModelInstance: BpmnModelInstance,
     processManager: ProcessManager
 ) : Instance(bpmnModelInstance, processManager) {
+
     private var status = ActivityStatus.READY
-    val activityStatus = mutableMapOf<String, ActivityStatus>()
-    private val variables = mutableMapOf<String, Any>()
-
     override fun getStatus(): ActivityStatus = status
-
     override fun setStatus(status: ActivityStatus) {
         if (this.status != status) {
             println("instance status change : ${this.status} -> $status ")
@@ -93,6 +111,7 @@ class StatelessInstance(
         this.status = status
     }
 
+    val activityStatus = mutableMapOf<String, ActivityStatus>()
     override fun setActivityStatus(id: String, status: ActivityStatus) {
         activityStatus[id] = status
         if (status == ActivityStatus.RUNNING) {
@@ -104,7 +123,8 @@ class StatelessInstance(
         return activityStatus[id] ?: ActivityStatus.READY
     }
 
-    override fun addVariable(name: String, value: Any) {
+    private val variables = mutableMapOf<String, Any>()
+    override fun addVariableStore(name: String, value: Any) {
         variables[name] = value
     }
 
