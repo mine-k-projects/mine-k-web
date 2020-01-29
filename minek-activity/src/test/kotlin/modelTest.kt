@@ -1,73 +1,91 @@
-import minek.activity.StatelessInstance
+import minek.activity.ProcessManager
+import minek.activity.behavior.BehaviorFactory
 import minek.activity.behavior.UserTaskBehavior
-import minek.activity.model.*
+import minek.activity.expression.JexlExpressionManager
+import minek.activity.extension.behavior
+import minek.activity.instance.StatelessInstance
+import org.camunda.bpm.model.bpmn.Bpmn
+import org.camunda.bpm.model.bpmn.instance.UserTask
 import org.junit.jupiter.api.Test
 
 class ModelTest {
 
+    val processManager = ProcessManager(JexlExpressionManager())
+
     @Test
     fun basicTest() {
-        val startEvent = StartEvent()
-        val userTask = UserTask()
-        val endEvent = EndEvent()
+        val bpmnModelInstance = Bpmn.createProcess()
+            .name("테스트 프로세스")
+            .executable()
+            .startEvent()
+            .userTask()
+            .id("userTask1")
+            .endEvent()
+            .done()
 
-        SequenceFlow.of(startEvent, userTask)
-        SequenceFlow.of(userTask, endEvent)
-
-        val process = Process().apply {
-            name = "테스트 프로세스"
-        }
-        process.addFlowElement(startEvent)
-        process.addFlowElement(userTask)
-        process.addFlowElement(endEvent)
-
-        val instance = StatelessInstance(process)
+        val instance = StatelessInstance(bpmnModelInstance, processManager)
         instance.execute()
 
         println("after...")
 
-        val behavior = userTask.behavior as UserTaskBehavior
+        val userTask = bpmnModelInstance.getModelElementById<UserTask>("userTask1")
+
+        val behavior = BehaviorFactory.build(userTask) as UserTaskBehavior
         behavior.completeTask(instance)
     }
 
     @Test
     fun parallelGatewayTest() {
-        val startEvent = StartEvent()
-        val userTask1 = UserTask()
-        val userTask2 = UserTask()
-        val gateway1 = ParallelGateway()
-        val gateway2 = ParallelGateway()
-        val endEvent = EndEvent()
+        val bpmnModelInstance = Bpmn.createProcess()
+            .startEvent()
+            .userTask().id("userTask1")
+            .parallelGateway("fork")
+            .serviceTask()
+            .parallelGateway("join")
+            .moveToNode("fork")
+            .userTask().id("userTask2")
+            .connectTo("join")
+            .moveToNode("fork")
+            .userTask().id("userTask3")
+            .connectTo("join")
+            .endEvent()
+            .done()
 
-        SequenceFlow.of(startEvent, gateway1)
-        SequenceFlow.of(gateway1, userTask1)
-        SequenceFlow.of(gateway1, userTask2)
-        SequenceFlow.of(userTask1, gateway2)
-        SequenceFlow.of(userTask2, gateway2)
-        SequenceFlow.of(gateway2, endEvent)
+        val instance = StatelessInstance(bpmnModelInstance, processManager)
+        instance.execute()
+    }
 
-        val process = Process().apply {
-            name = "테스트 프로세스"
-        }
-        process.addFlowElement(startEvent)
-        process.addFlowElement(userTask1)
-        process.addFlowElement(userTask2)
-        process.addFlowElement(gateway1)
-        process.addFlowElement(gateway2)
-        process.addFlowElement(endEvent)
+    @Test
+    fun exclusiveGatewayTest() {
+        val bpmnModelInstance = Bpmn.createProcess()
+            .startEvent()
+            .userTask().id("userTask1")
+            .exclusiveGateway()
+            .name("Everything fine?")
+            .condition("yes", "foo == 1")
+            .serviceTask()
+            .userTask().id("userTask2")
+            .endEvent()
+            .moveToLastGateway()
+            .condition("no", "foo == 2")
+            .userTask().id("userTask3")
+            .connectTo("userTask1")
+            .done()
 
-        val instance = StatelessInstance(process)
+        val instance = StatelessInstance(bpmnModelInstance, processManager)
+        instance.addVariable("foo", 1)
         instance.execute()
 
         println("after...")
 
-        val behavior1 = userTask1.behavior as UserTaskBehavior
-        behavior1.completeTask(instance)
+        (bpmnModelInstance.getModelElementById<UserTask>("userTask1").behavior() as UserTaskBehavior).completeTask(
+            instance
+        )
 
         println("after...")
 
-        val behavior2 = userTask2.behavior as UserTaskBehavior
-        behavior2.completeTask(instance)
+        (bpmnModelInstance.getModelElementById<UserTask>("userTask2").behavior() as UserTaskBehavior).completeTask(
+            instance
+        )
     }
-
 }
