@@ -11,5 +11,4 @@ class BooleanType : VariableType {
     override fun getValue(store: VariableStore): Boolean = store.textValue!!.toBoolean()
 
     override fun isAbleToStore(value: Any): Boolean = value is Boolean
-
 }

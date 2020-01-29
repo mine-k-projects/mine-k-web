@@ -11,5 +11,4 @@ class ByteArrayType : VariableType {
     override fun getValue(store: VariableStore): ByteArray = store.byteaValue!!
 
     override fun isAbleToStore(value: Any): Boolean = value is ByteArray
-
 }

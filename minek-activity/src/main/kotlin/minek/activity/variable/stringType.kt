@@ -11,5 +11,4 @@ class StringType : VariableType {
     override fun getValue(store: VariableStore): String = store.textValue!!
 
     override fun isAbleToStore(value: Any): Boolean = value is String
-
 }

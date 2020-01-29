@@ -13,5 +13,4 @@ class UUIDType : VariableType {
     override fun getValue(store: VariableStore): UUID = UUID.fromString(store.textValue)
 
     override fun isAbleToStore(value: Any): Boolean = value is UUID
-
 }

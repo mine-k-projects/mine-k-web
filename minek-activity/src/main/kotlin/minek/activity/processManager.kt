@@ -16,22 +16,7 @@ class ProcessManager(
 
     val variableTypes by lazy {
         arrayOf(
-            StringType()
-            , IntType()
-            , LongType()
-            , DoubleType()
-            , BooleanType()
-            , UUIDType()
-            , FloatType()
-            , ShortType()
-            , DateType()
-            , LocalTimeType()
-            , LocalDateTimeType()
-            , LocalDateType()
-            , ByteArrayType()
-            , JsonType(objectMapper)
-            , SerializableType(xmlMapper)
+            StringType(), IntType(), LongType(), DoubleType(), BooleanType(), UUIDType(), FloatType(), ShortType(), DateType(), LocalTimeType(), LocalDateTimeType(), LocalDateType(), ByteArrayType(), JsonType(objectMapper), SerializableType(xmlMapper)
         )
     }
-
 }

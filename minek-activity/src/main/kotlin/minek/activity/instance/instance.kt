@@ -1,17 +1,17 @@
 package minek.activity.instance
 
 import com.fasterxml.jackson.databind.JsonNode
+import java.io.Serializable
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.util.*
 import minek.activity.ProcessManager
 import minek.activity.behavior.BehaviorFactory
 import minek.activity.extension.initialFlowElement
 import org.camunda.bpm.model.bpmn.BpmnModelInstance
 import org.camunda.bpm.model.bpmn.instance.FlowNode
 import org.camunda.bpm.model.bpmn.instance.Process
-import java.io.Serializable
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.util.*
 
 enum class ActivityStatus {
     READY, RUNNING, COMPLETED, SUSPENDED, STOPPED
@@ -58,7 +58,7 @@ abstract class Instance(val bpmnModelInstance: BpmnModelInstance, val processMan
     fun addVariable(name: String, value: LocalDate) = this.addVariableStore(name, value)
     fun addVariable(name: String, value: LocalDateTime) = this.addVariableStore(name, value)
     fun addVariable(name: String, value: LocalTime) = this.addVariableStore(name, value)
-    abstract fun addVariableStore(name: String, value: Any)
+    protected abstract fun addVariableStore(name: String, value: Any)
     abstract fun setVariables(variables: Map<String, Any>)
     abstract fun getVariables(): Map<String, Any>
 }
@@ -85,7 +85,7 @@ class StatefulInstance(
     }
 
     override fun addVariableStore(name: String, value: Any) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
     }
 
     override fun setVariables(variables: Map<String, Any>) {

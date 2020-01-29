@@ -50,7 +50,7 @@ dependencies {
 
     implementation database.library
 
-    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.10.1"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:${versions.jackson}"
 
     implementation "com.squareup.retrofit2:converter-jackson:$versions.retrofit"
     implementation "com.squareup.retrofit2:converter-scalars:$versions.retrofit"

@@ -19,5 +19,4 @@ class SerializableType(private val xmlMapper: XmlMapper) : VariableType {
     }
 
     override fun isAbleToStore(value: Any): Boolean = value is Serializable
-
 }

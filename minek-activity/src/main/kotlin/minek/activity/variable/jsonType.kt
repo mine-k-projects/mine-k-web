@@ -14,5 +14,4 @@ class JsonType(private val objectMapper: ObjectMapper) : VariableType {
     override fun getValue(store: VariableStore): JsonNode = objectMapper.readTree(store.textValue)
 
     override fun isAbleToStore(value: Any): Boolean = value is JsonNode
-
 }

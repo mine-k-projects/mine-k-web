@@ -14,7 +14,6 @@ class DateType : VariableType {
     override fun getValue(store: VariableStore): Date = Date(store.longValue!!)
 
     override fun isAbleToStore(value: Any): Boolean = value::class.java.isAssignableFrom(Date::class.java)
-
 }
 
 class LocalTimeType : VariableType {
@@ -28,7 +27,6 @@ class LocalTimeType : VariableType {
     override fun getValue(store: VariableStore): LocalTime = LocalTime.ofNanoOfDay(store.longValue!!)
 
     override fun isAbleToStore(value: Any): Boolean = value is LocalTime
-
 }
 
 class LocalDateTimeType : VariableType {
@@ -43,7 +41,6 @@ class LocalDateTimeType : VariableType {
         LocalDateTime.ofInstant(Instant.ofEpochSecond(store.longValue!!), ZoneId.systemDefault())
 
     override fun isAbleToStore(value: Any): Boolean = value is LocalDateTime
-
 }
 
 class LocalDateType : VariableType {
@@ -57,5 +54,4 @@ class LocalDateType : VariableType {
     override fun getValue(store: VariableStore): LocalDate = LocalDate.ofEpochDay(store.longValue!!)
 
     override fun isAbleToStore(value: Any): Boolean = value is LocalDate
-
 }
