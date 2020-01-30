@@ -2,6 +2,7 @@ buildscript {
     def env = { String name -> System.getProperty(name, System.getenv(name)) }
 
     ext.versions = [
+            'kotlin'            : '1.3.61',
             'kotlinx_coroutines': '1.3.2',
             'arrow_kt'          : '0.10.3',
             'jackson'           : '2.10.1',

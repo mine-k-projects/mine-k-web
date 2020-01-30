@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 
 class ModelTest {
 
-    val processManager = ProcessManager(JexlExpressionManager())
+    val processManager = ProcessManager()
 
     @Test
     fun basicTest() {
