@@ -2,16 +2,16 @@ package minek.jooq.binding.postgres
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.google.gson.JsonElement
+import java.sql.SQLException
+import java.sql.SQLFeatureNotSupportedException
+import java.sql.Types
+import java.util.*
 import minek.jooq.converter.gson.JSONBToGsonConverter
 import minek.jooq.converter.gson.JSONToGsonConverter
 import minek.jooq.converter.jackson.JSONBToJacksonConverter
 import minek.jooq.converter.jackson.JSONToJacksonConverter
 import org.jooq.*
 import org.jooq.impl.DSL
-import java.sql.SQLException
-import java.sql.SQLFeatureNotSupportedException
-import java.sql.Types
-import java.util.*
 
 abstract class JsonBinding<T, U> : Binding<T, U> {
 

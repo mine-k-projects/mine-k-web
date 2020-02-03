@@ -1,14 +1,15 @@
 package minek.excel
 
-import java.io.File
-import java.io.OutputStream
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.util.*
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import java.io.File
+import java.io.InputStream
+import java.io.OutputStream
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.*
 
 @Suppress("SpellCheckingInspection")
 enum class WorkbookType(val extension: String) {
@@ -63,23 +64,36 @@ data class StyleOption(
     }
 }
 
-class Workbook(type: WorkbookType) {
-    private val workbook: org.apache.poi.ss.usermodel.Workbook = when (type) {
-        WorkbookType.HSSF -> HSSFWorkbook()
-        WorkbookType.XSSF -> XSSFWorkbook()
-        WorkbookType.SXSSF -> SXSSFWorkbook()
-    }
+class Workbook(
+    private val workbook: org.apache.poi.ss.usermodel.Workbook
+) : org.apache.poi.ss.usermodel.Workbook by workbook {
+
     val styles = mutableMapOf<String, CellStyle>()
 
     fun richTextString(value: String): RichTextString {
         return workbook.creationHelper.createRichTextString(value)
     }
 
-    fun sheet(sheetName: String? = null, init: Sheet.() -> Unit): Sheet =
-        Sheet(
-            this,
-            if (sheetName != null) workbook.createSheet(sheetName) else workbook.createSheet()
-        ).apply(init)
+    /**
+     * read sheet by index number
+     */
+    fun sheet(index: Int, init: Sheet.() -> Unit): Sheet {
+        return Sheet(this, getSheetAt(index)).apply(init)
+    }
+
+    /**
+     * read sheet by name. if empty, create a sheet
+     */
+    fun sheet(sheetName: String, init: Sheet.() -> Unit): Sheet {
+        return Sheet(this, getSheet(sheetName) ?: workbook.createSheet(sheetName)).apply(init)
+    }
+
+    /**
+     * create sheet
+     */
+    fun sheet(init: Sheet.() -> Unit): Sheet {
+        return Sheet(this, workbook.createSheet()).apply(init)
+    }
 
     fun style(styleName: String, option: StyleOption) {
         styles[styleName] = workbook.createCellStyle().apply {
@@ -123,14 +137,40 @@ class Workbook(type: WorkbookType) {
     fun generate(os: OutputStream) = workbook.use { os.use { workbook.write(os) } }
 }
 
+/**
+ * use to write
+ */
 fun workbook(type: WorkbookType = WorkbookType.XSSF, init: Workbook.() -> Unit): Workbook = Workbook(
-    type
+    when (type) {
+        WorkbookType.HSSF -> HSSFWorkbook()
+        WorkbookType.XSSF -> XSSFWorkbook()
+        WorkbookType.SXSSF -> SXSSFWorkbook()
+    }
+).apply(init)
+
+/**
+ * use to read
+ */
+fun workbook(file: File, type: WorkbookType = WorkbookType.XSSF, init: Workbook.() -> Unit): Workbook {
+    return workbook(file.inputStream(), type, init)
+}
+
+/**
+ * use to read
+ */
+fun workbook(`is`: InputStream, type: WorkbookType = WorkbookType.XSSF, init: Workbook.() -> Unit): Workbook = Workbook(
+    when (type) {
+        WorkbookType.HSSF -> HSSFWorkbook(`is`)
+        WorkbookType.XSSF -> XSSFWorkbook(`is`)
+        WorkbookType.SXSSF -> throw UnsupportedOperationException()
+    }
 ).apply(init)
 
 class Sheet(
     private val workbook: Workbook,
     private val sheet: org.apache.poi.ss.usermodel.Sheet
-) {
+) : org.apache.poi.ss.usermodel.Sheet by sheet {
+
     fun row(
         @Suppress("SpellCheckingInspection") rownum: Int = sheet.physicalNumberOfRows,
         height: Short = sheet.defaultRowHeight,
@@ -146,21 +186,12 @@ class Sheet(
     fun columnWidth(columnIndex: Int, width: Int) {
         sheet.setColumnWidth(columnIndex, width)
     }
-
-    fun autoSizeColumn(columnIndex: Int) {
-        sheet.autoSizeColumn(columnIndex)
-    }
 }
 
 class Row(
     private val workbook: Workbook,
     private val row: org.apache.poi.ss.usermodel.Row
-) {
-    var height: Short
-        set(value) {
-            row.height = value
-        }
-        get() = row.height
+) : org.apache.poi.ss.usermodel.Row by row {
 
     fun cell(
         value: String?,
@@ -217,13 +248,4 @@ class Row(
     }
 }
 
-class Cell(private val cell: org.apache.poi.ss.usermodel.Cell) {
-    @Suppress("DEPRECATION")
-    var cellType: CellType
-        set(value) {
-            cell.cellType = value
-        }
-        get() {
-            return cell.cellType
-        }
-}
+class Cell(private val cell: org.apache.poi.ss.usermodel.Cell) : org.apache.poi.ss.usermodel.Cell by cell
