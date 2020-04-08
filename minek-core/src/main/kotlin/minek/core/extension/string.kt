@@ -24,3 +24,9 @@ fun String.base64Decoded(): String? = try {
 
 fun String.isNumeric(): Boolean = this.matches("-?\\d+(\\.\\d+)?".toRegex())
 fun String.isDigit(): Boolean = this.matches("^[0-9]*\$".toRegex())
+
+fun String.dropLast(s: String): String {
+    val lastIndexOf = this.lastIndexOf(s)
+    if (lastIndexOf == -1) return this
+    return this.substring(0, lastIndexOf)
+}

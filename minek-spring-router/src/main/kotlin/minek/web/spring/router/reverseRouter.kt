@@ -1,13 +1,20 @@
 package minek.web.spring.router
 
+import com.google.common.cache.CacheBuilder
+import com.google.common.cache.CacheLoader
 import java.nio.charset.StandardCharsets
+import java.util.*
+import java.util.regex.Pattern
 import javax.servlet.http.HttpServletRequest
 import kotlin.reflect.KFunction
 import kotlin.reflect.jvm.javaMethod
+import minek.core.extension.dropLast
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
 import org.springframework.web.util.UriComponentsBuilder
+import org.springframework.web.util.UrlPathHelper
 
 abstract class AbstractUriBuilder {
 
@@ -17,24 +24,12 @@ abstract class AbstractUriBuilder {
     private val queryParams: MutableList<Param> = mutableListOf()
 
     fun queryParam(name: String, vararg values: Any?): AbstractUriBuilder {
-        this.queryParams.add(
-            Param(
-                false,
-                name,
-                values.toList()
-            )
-        )
+        this.queryParams.add(Param(false, name, values.toList()))
         return this
     }
 
     fun replaceQueryParam(name: String, vararg values: Any?): AbstractUriBuilder {
-        this.queryParams.add(
-            Param(
-                true,
-                name,
-                values.toList()
-            )
-        )
+        this.queryParams.add(Param(true, name, values.toList()))
         return this
     }
 
@@ -55,8 +50,19 @@ abstract class AbstractUriBuilder {
 }
 
 class UriBuilder(path: String) : AbstractUriBuilder() {
+
+    companion object {
+        private val PATTERN = Pattern.compile("\\{(.*?)}")
+    }
+
     override val uriComponentsBuilder: UriComponentsBuilder = UriComponentsBuilder.fromPath(path)
     private val uriVariables = mutableMapOf<String, Any?>()
+    private var excludeRegex = false
+
+    fun withoutRegex(): UriBuilder {
+        excludeRegex = true
+        return this
+    }
 
     fun arg(key: String, value: Any?): UriBuilder {
         uriVariables[key] = value
@@ -74,15 +80,39 @@ class UriBuilder(path: String) : AbstractUriBuilder() {
     }
 
     override fun build(): String {
-        return bindParams(uriComponentsBuilder.cloneBuilder())
-            .buildAndExpand(uriVariables)
+        val uri = bindParams(uriComponentsBuilder.cloneBuilder())
+            .uriVariables(uriVariables)
+//            .buildAndExpand(uriVariables)
             .encode(StandardCharsets.UTF_8)
             .toUriString()
+
+        return if (excludeRegex) {
+            removeRegex(uri)
+        } else {
+            uri
+        }
+    }
+
+    private fun removeRegex(uri: String): String {
+        val matcher = PATTERN.matcher(uri)
+        val sb = StringBuffer()
+        while (matcher.find()) {
+            val findText = matcher.group().removePrefix("{").removeSuffix("}")
+            val paramName = if (findText.indexOf(":") != -1) {
+                findText.split(":")[0]
+            } else {
+                findText
+            }
+            matcher.appendReplacement(sb, "{$paramName}")
+        }
+        matcher.appendTail(sb)
+        return sb.toString()
     }
 }
 
 class CurrentUriBuilder(private val request: HttpServletRequest) : AbstractUriBuilder() {
-    override val uriComponentsBuilder: UriComponentsBuilder = UriComponentsBuilder.fromUriString(request.requestURI)
+    override val uriComponentsBuilder: UriComponentsBuilder =
+        UriComponentsBuilder.fromUriString(UrlPathHelper().getOriginatingRequestUri(request))
     private var includeQueryString: Boolean = false
 
     fun withQueryString(): CurrentUriBuilder {
@@ -118,39 +148,54 @@ class ReverseRouter {
         private const val SEPARATOR = "."
     }
 
-    fun currentUrlFor(): CurrentUriBuilder {
-        return CurrentUriBuilder(request)
-    }
+    fun currentUrlFor(): CurrentUriBuilder = CurrentUriBuilder(request)
 
-    fun urlFor(function: KFunction<*>): UriBuilder {
-        val methodName = function.javaMethod!!
-        val controllerName = methodName.declaringClass.simpleName
-        return urlFor(controllerName + SEPARATOR + methodName.name)
-    }
+    fun referer(): String? = request.getHeader("referer")
+
+    fun referer(defaultUri: String): String? = referer() ?: defaultUri
+
+    private val cache = CacheBuilder.newBuilder()
+        .maximumSize(100)
+        .build(object : CacheLoader<String, Optional<RequestMappingInfo>>() {
+            override fun load(key: String): Optional<RequestMappingInfo> {
+                val split = key.split(SEPARATOR)
+                val (controllerName, methodName) = split[0].toLowerCase() to split[1]
+                val handler = requestMappingHandlerMapping.handlerMethods
+                    .filter { (_, handler) ->
+                        val className = handler.beanType.simpleName.toLowerCase()
+                        (controllerName == className || controllerName == className.dropLast("controller")) &&
+                                methodName == handler.method.name
+                    }
+                    .toList()
+                    .firstOrNull()
+                return Optional.ofNullable(handler?.first)
+            }
+        })
 
     /**
-     * @param pattern controllerName#methodName (example : mainController.main)
+     * the controllerName for the pattern ignores case and the suffix "Controller" is optional
+     * @param pattern controllerName.methodName (example : main.index, mainController.index, MainController.index)
      */
     fun urlFor(pattern: String): UriBuilder {
+        if (pattern.startsWith("/")) {
+            return UriBuilder(request.contextPath + pattern)
+        }
+
         val split = pattern.split(SEPARATOR)
         if (split.size != 2) {
             throw RuntimeException("pattern error")
         }
 
-        val (controllerName, methodName) = split[0].decapitalize() to split[1]
-
-        val handler = requestMappingHandlerMapping.handlerMethods
-            .filter { (_, handler) ->
-                controllerName == handler.beanType.simpleName.decapitalize() && methodName == handler.method.name
-            }
-            .toList()
-            .firstOrNull()
-
-        @Suppress("FoldInitializerAndIfToElvis")
-        if (handler == null) {
-            throw RuntimeException("not found handler")
+        val optional = cache.get(pattern)
+        if (optional.isPresent) {
+            return UriBuilder(optional.get().patternsCondition.patterns.toList()[0])
         }
+        return UriBuilder("/$pattern")
+    }
 
-        return UriBuilder(handler.first.patternsCondition.patterns.toList()[0])
+    fun urlFor2(function: KFunction<*>): UriBuilder {
+        val methodName = function.javaMethod!!
+        val controllerName = methodName.declaringClass.simpleName
+        return urlFor(controllerName.decapitalize() + SEPARATOR + methodName.name)
     }
 }

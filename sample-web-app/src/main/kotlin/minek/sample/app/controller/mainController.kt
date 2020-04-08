@@ -182,9 +182,9 @@ class MainController : BaseController() {
 
     @GetMapping("/router")
     fun router() {
-        val mvcUrl2 = reverseRouter.urlFor(ArgController::pathVarialbeTest).args("hong1" to "555", "userId" to "aaaaaaa").build()
+        val mvcUrl2 = reverseRouter.urlFor2(ArgController::pathVarialbeTest).args("hong1" to "555", "userId" to "aaaaaaa").build()
 
-        val mvcUrl = reverseRouter.urlFor(ArgController::pathVarialbeTest22222222).args("hong1" to "555").build()
+        val mvcUrl = reverseRouter.urlFor2(ArgController::pathVarialbeTest22222222).args("hong1" to "555").build()
 
         println()
     }

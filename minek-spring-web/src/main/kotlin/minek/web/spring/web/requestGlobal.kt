@@ -1,4 +1,4 @@
-package minek.web.spring.web.controller
+package minek.web.spring.web
 
 import minek.web.spring.auth.AuthService
 import minek.web.spring.auth.Principal
